@@ -299,7 +299,10 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     if(nTmp>-1)
         nPercentHumdity = nTmp;
 
-	dDewPointTemp = m_SoloCloudwatcher.getDewPointTemp();
+    dTmp = m_SoloCloudwatcher.getDewPointTemp();
+    if(dTmp<100)
+        dDewPointTemp = dTmp;
+    
     dBarometricPressure = m_SoloCloudwatcher.getBarometricPressure();
 
     cloudCondition = (WeatherStationDataInterface::x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
