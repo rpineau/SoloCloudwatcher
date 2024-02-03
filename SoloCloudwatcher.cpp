@@ -135,7 +135,7 @@ int CSoloCloudwatcher::Connect()
         m_ThreadsAreRunning = true;
     }
 
-
+    m_goodDataTimer.Reset();
     return nErr;
 }
 
@@ -318,11 +318,15 @@ int     CSoloCloudwatcher::getBarometricPressureCondition()
     return m_nBarometricPressureCondition;
 }
 
-int     CSoloCloudwatcher::getSafeCondition()
+int CSoloCloudwatcher::getSafeCondition()
 {
     return m_nOverallConditionSafe;
 }
 
+double CSoloCloudwatcher::getSecondOfGoodData()
+{
+    return m_goodDataTimer.GetElapsedSeconds();
+}
 
 int CSoloCloudwatcher::getData()
 {
@@ -342,6 +346,7 @@ int CSoloCloudwatcher::getData()
     // do http GET request to PLC got get current Az or Ticks .. TBD
     nErr = doGET("/cgi-bin/cgiLastData", response_string);
     if(nErr) {
+        m_goodDataTimer.Reset();
         return ERR_CMDFAILED;
     }
 
@@ -505,7 +510,7 @@ int CSoloCloudwatcher::parseFields(const std::string sIn, std::map<std::string, 
         nErr = PARSE_FAILED;
     }
 
-    // now sptin each vector entry into key,value
+    // now split each vector entry into key,value
     for(i=0; i<svLines.size(); i++){
         std::stringstream(svLines[i]).swap(ssTmp);
         svFields.clear();

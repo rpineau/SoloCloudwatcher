@@ -279,17 +279,26 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 )
 {
     int nErr = SB_OK;
+    int nTmp;
+    double dTmp;
 
     if(!m_bLinked)
         return ERR_NOLINK;
 
     X2MutexLocker ml(GetMutex());
 
-    nSecondsSinceGoodData = 1; // was 900 , aka 15 minutes ?
+    nSecondsSinceGoodData = m_SoloCloudwatcher.getSecondOfGoodData();
     dSkyTemp = m_SoloCloudwatcher.getSkyTemp();
     dAmbTemp = m_SoloCloudwatcher.getAmbianTemp();
-    dWind = m_SoloCloudwatcher.getWindSpeed();
-	nPercentHumdity = m_SoloCloudwatcher.getHumidity();
+    
+    dTmp = m_SoloCloudwatcher.getWindSpeed();
+    if(dTmp >-1)
+        dWind = dTmp;
+
+    nTmp = m_SoloCloudwatcher.getHumidity();
+    if(nTmp>-1)
+        nPercentHumdity = nTmp;
+
 	dDewPointTemp = m_SoloCloudwatcher.getDewPointTemp();
     dBarometricPressure = m_SoloCloudwatcher.getBarometricPressure();
 

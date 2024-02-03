@@ -44,7 +44,9 @@
 
 #include "../../licensedinterfaces/sberrorx.h"
 
-#define PLUGIN_VERSION      1.0
+#include "StopWatch.h"
+
+#define PLUGIN_VERSION      1.05
 
 // #define PLUGIN_DEBUG 3
 
@@ -93,6 +95,7 @@ public:
     int     getBarometricPressureCondition();
 
     int     getSafeCondition();
+    double  getSecondOfGoodData();
 
 #ifdef PLUGIN_DEBUG
     void  log(const std::string sLogLine);
@@ -137,6 +140,7 @@ protected:
 
     std::atomic<int>    m_nOverallConditionSafe;
 
+    CStopWatch      m_goodDataTimer;
 
     bool            m_bSafe;
     int             doGET(std::string sCmd, std::string &sResp);
