@@ -75,6 +75,9 @@ int X2WeatherStation::execModalSettingsDialog()
 
     char szTmpBuf[LOG_BUFFER_SIZE];
     std::stringstream ssTmp;
+    double dTmp;
+    int nTmp;
+
     std::string sIpAddress;
     std::vector<int> txIds;
 
@@ -100,15 +103,23 @@ int X2WeatherStation::execModalSettingsDialog()
         dx->setEnabled("IPAddress", false);
         dx->setEnabled("pushButton", true);
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbianTemp() << " C";
+        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbianTemp() << " ºC";
         dx->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::dec << m_SoloCloudwatcher.getHumidity() << " %";
+        nTmp = m_SoloCloudwatcher.getHumidity();
+        if(nTmp>-1)
+            ssTmp<< std::dec << m_SoloCloudwatcher.getHumidity() << " %";
+        else
+            ssTmp <<"N/A";
         dx->setPropertyString("humidity", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getDewPointTemp() << " C";
+        dTmp = m_SoloCloudwatcher.getDewPointTemp();
+        if(dTmp<100)
+            ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getDewPointTemp() << " ºC";
+        else
+            ssTmp <<"N/A";
         dx->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -116,11 +127,19 @@ int X2WeatherStation::execModalSettingsDialog()
         dx->setPropertyString("pressure", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindSpeed() << " km/h";
+        dTmp = m_SoloCloudwatcher.getWindSpeed();
+        if(dTmp >-1)
+            ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindSpeed() << " km/h";
+        else
+            ssTmp <<"N/A";
         dx->setPropertyString("windSpeed", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindGust() << " km/h";
+        dTmp = m_SoloCloudwatcher.getWindGust();
+        if(dTmp >-1)
+            ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindGust() << " km/h";
+        else
+            ssTmp <<"N/A";
         dx->setPropertyString("windGust", "text", ssTmp.str().c_str());
     }
     else {
@@ -151,6 +170,8 @@ int X2WeatherStation::execModalSettingsDialog()
 void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEvent)
 {
     std::stringstream ssTmp;
+    double dTmp;
+    int nTmp;
 
     // the test for m_bUiEnabled is done because even if the UI is not displayed we get events on the comboBox changes when we fill it.
     if(!m_bLinked | !m_bUiEnabled)
@@ -158,15 +179,23 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
 
 
     if (!strcmp(pszEvent, "on_timer") && m_bLinked) {
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbianTemp() << " C";
+        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbianTemp() << " ºC";
         uiex->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::dec << m_SoloCloudwatcher.getHumidity() << " %";
+        nTmp = m_SoloCloudwatcher.getHumidity();
+        if(nTmp>-1)
+            ssTmp<< std::dec << m_SoloCloudwatcher.getHumidity() << " %";
+        else
+            ssTmp <<"N/A";
         uiex->setPropertyString("humidity", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getDewPointTemp() << " C";
+        dTmp = m_SoloCloudwatcher.getDewPointTemp();
+        if(dTmp<100)
+            ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getDewPointTemp() << " ºC";
+        else
+            ssTmp <<"N/A";
         uiex->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -174,16 +203,19 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
         uiex->setPropertyString("pressure", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindSpeed() << " km/h";
+        dTmp = m_SoloCloudwatcher.getWindSpeed();
+        if(dTmp >-1)
+            ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindSpeed() << " km/h";
+        else
+            ssTmp <<"N/A";
         uiex->setPropertyString("windSpeed", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindCondition() << " km/h";
-        uiex->setPropertyString("windSpeed10min", "text", ssTmp.str().c_str());
-
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getRainCondition() << " cm";
-        uiex->setPropertyString("rainfallLast15Min", "text", ssTmp.str().c_str());
+        if(dTmp >-1)
+            ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindGust() << " km/h";
+        else
+            ssTmp <<"N/A";
+        uiex->setPropertyString("windGust", "text", ssTmp.str().c_str());
     }
 }
 
@@ -287,7 +319,7 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 
     X2MutexLocker ml(GetMutex());
 
-    nSecondsSinceGoodData = m_SoloCloudwatcher.getSecondOfGoodData();
+    nSecondsSinceGoodData = int(std::round(m_SoloCloudwatcher.getSecondOfGoodData()));
     dSkyTemp = m_SoloCloudwatcher.getSkyTemp();
     dAmbTemp = m_SoloCloudwatcher.getAmbianTemp();
     
