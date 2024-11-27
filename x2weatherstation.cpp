@@ -305,12 +305,20 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     
     dBarometricPressure = m_SoloCloudwatcher.getBarometricPressure();
 
-    cloudCondition = (WeatherStationDataInterface::x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
-    windCondition = (WeatherStationDataInterface::x2WindCond)m_SoloCloudwatcher.getWindCondition();
-    rainCondition = (WeatherStationDataInterface::x2RainCond)m_SoloCloudwatcher.getRainCondition();
-    daylightCondition = (WeatherStationDataInterface::x2DayCond)m_SoloCloudwatcher.getLightCondition();
+    // cloudCondition = (WeatherStationDataInterface::x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
+    // windCondition = (WeatherStationDataInterface::x2WindCond)m_SoloCloudwatcher.getWindCondition();
+    // rainCondition = (WeatherStationDataInterface::x2RainCond)m_SoloCloudwatcher.getRainCondition();
+    // daylightCondition = (WeatherStationDataInterface::x2DayCond)m_SoloCloudwatcher.getLightCondition();
 
-    nRoofCloseThisCycle = m_SoloCloudwatcher.getSafeCondition()==0?1:0; // solo cloudwatcher report 0 for unsafe, 1 for safe
+	// solo cloudwatcher report 0 for unknow, 1 for safe, 2 for unsafe
+
+	cloudCondition = (m_SoloCloudwatcher.getCloudCondition() == 1) ? WeatherStationDataInterface::x2CloudCond::cloudClear : WeatherStationDataInterface::x2CloudCond::cloudCloudy;
+	windCondition =  (m_SoloCloudwatcher.getWindCondition() == 1) ? WeatherStationDataInterface::x2WindCond::windCalm : WeatherStationDataInterface::x2WindCond::windWindy;
+	rainCondition = (m_SoloCloudwatcher.getRainCondition() == 1) ? WeatherStationDataInterface::x2RainCond::rainDry : WeatherStationDataInterface::x2RainCond::rainRain;
+	daylightCondition = (m_SoloCloudwatcher.getLightCondition() == 1) ? WeatherStationDataInterface::x2DayCond::dayDark : WeatherStationDataInterface::x2DayCond::dayVeryLight;
+
+	// solo cloudwatcher report 0 for unsafe, 1 for safe
+    nRoofCloseThisCycle = m_SoloCloudwatcher.getSafeCondition()==0?1:0;
 
 	return nErr;
 }
