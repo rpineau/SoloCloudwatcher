@@ -27,6 +27,8 @@
 
 #define PARENT_KEY      "SoloCloudwatcher"
 #define CHILD_KEY_IP    "IPAddress"
+#define CHILD_KEY_SQM   "SqmThreshold"
+
 #define LOG_BUFFER_SIZE 8192
 
 // Forward declare the interfaces that this device is dependent upon
@@ -148,10 +150,11 @@ private:
 	TickCountInterface						*GetTickCountInterface() {return m_pTickCount;}
 
 
-    int     m_nPrivateISIndex;
-	bool    m_bLinked;
+    int     m_nPrivateISIndex = 0;
+	bool    m_bLinked = false;
 
-    bool    m_bUiEnabled;
+	bool    m_bUiEnabled = false;
+	double  m_dSqmThreshold = 0.0;
 
     CSoloCloudwatcher        m_SoloCloudwatcher;
 

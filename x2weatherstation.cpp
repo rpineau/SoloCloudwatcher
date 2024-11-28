@@ -28,6 +28,7 @@ X2WeatherStation::X2WeatherStation(const char* pszDisplayName,
         char szIpAddress[128];
         m_pIniUtil->readString(PARENT_KEY, CHILD_KEY_IP, "192.168.0.10", szIpAddress, 128);
         m_SoloCloudwatcher.setIpAddress(std::string(szIpAddress));
+		m_dSqmThreshold = m_pIniUtil->readDouble(PARENT_KEY, CHILD_KEY_SQM, 13);
     }
 }
 
@@ -77,6 +78,7 @@ int X2WeatherStation::execModalSettingsDialog()
     std::stringstream ssTmp;
     std::string sIpAddress;
     std::vector<int> txIds;
+	double dTmp;
 
     m_bUiEnabled = false;
 
@@ -94,35 +96,47 @@ int X2WeatherStation::execModalSettingsDialog()
     m_SoloCloudwatcher.getIpAddress(sIpAddress);
     dx->setPropertyString("IPAddress", "text", sIpAddress.c_str());
 
-    if(m_bLinked) {
+	if(m_bLinked) {
 
-        // we can't change the value for the ip and port if we're connected
-        dx->setEnabled("IPAddress", false);
-        dx->setEnabled("pushButton", true);
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbianTemp() << " C";
-        dx->setPropertyString("temperature", "text", ssTmp.str().c_str());
+		// we can't change the value for the ip and port if we're connected
+		dx->setEnabled("IPAddress", false);
+		dx->setEnabled("pushButton", true);
+		std::stringstream().swap(ssTmp);
+		ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbientTemp() << " C";
+		dx->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::dec << m_SoloCloudwatcher.getHumidity() << " %";
-        dx->setPropertyString("humidity", "text", ssTmp.str().c_str());
+		std::stringstream().swap(ssTmp);
+		ssTmp<< std::dec << m_SoloCloudwatcher.getHumidity() << " %";
+		dx->setPropertyString("humidity", "text", ssTmp.str().c_str());
 
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getDewPointTemp() << " C";
-        dx->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
+		std::stringstream().swap(ssTmp);
+		ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getDewPointTemp() << " C";
+		dx->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
 
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getBarometricPressure() << " mbar";
-        dx->setPropertyString("pressure", "text", ssTmp.str().c_str());
+		std::stringstream().swap(ssTmp);
+		ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getBarometricPressure() << " mbar";
+		dx->setPropertyString("pressure", "text", ssTmp.str().c_str());
 
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindSpeed() << " km/h";
-        dx->setPropertyString("windSpeed", "text", ssTmp.str().c_str());
+		std::stringstream().swap(ssTmp);
+		ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindSpeed() << " km/h";
+		dx->setPropertyString("windSpeed", "text", ssTmp.str().c_str());
 
-        std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindGust() << " km/h";
-        dx->setPropertyString("windGust", "text", ssTmp.str().c_str());
-    }
+		std::stringstream().swap(ssTmp);
+		ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getWindGust() << " km/h";
+		dx->setPropertyString("windGust", "text", ssTmp.str().c_str());
+
+		dx->setEnabled("sqmThreshold", m_SoloCloudwatcher.isSqmAvailable());
+
+		if(m_SoloCloudwatcher.isSqmAvailable()) {
+			dTmp = m_SoloCloudwatcher.getSQM();
+			ssTmp << std::fixed << std::setprecision(2) << dTmp << " mpsas";
+			dx->setText("SQM", ssTmp.str().c_str());
+		}
+		else {
+			dx->setText("SQM", "N/A");
+
+		}
+	}
     else {
         dx->setEnabled("IPAddress", true);
         dx->setEnabled("pushButton", false);
@@ -142,7 +156,8 @@ int X2WeatherStation::execModalSettingsDialog()
             dx->propertyString("IPAddress", "text", szTmpBuf, 128);
             nErr |= m_pIniUtil->writeString(PARENT_KEY, CHILD_KEY_IP, szTmpBuf);
             m_SoloCloudwatcher.setIpAddress(std::string(szTmpBuf));
-
+			dx->propertyDouble("sqmThreshold", "value", m_dSqmThreshold);
+			m_pIniUtil->writeDouble(PARENT_KEY, CHILD_KEY_SQM, m_dSqmThreshold);
         }
     }
     return nErr;
@@ -151,6 +166,7 @@ int X2WeatherStation::execModalSettingsDialog()
 void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEvent)
 {
     std::stringstream ssTmp;
+	double dTmp;
 
     // the test for m_bUiEnabled is done because even if the UI is not displayed we get events on the comboBox changes when we fill it.
     if(!m_bLinked | !m_bUiEnabled)
@@ -158,7 +174,7 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
 
 
     if (!strcmp(pszEvent, "on_timer") && m_bLinked) {
-        ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbianTemp() << " C";
+		ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getAmbientTemp() << " C";
         uiex->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -184,6 +200,17 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
         std::stringstream().swap(ssTmp);
         ssTmp<< std::fixed << std::setprecision(2) << m_SoloCloudwatcher.getRainCondition() << " cm";
         uiex->setPropertyString("rainfallLast15Min", "text", ssTmp.str().c_str());
+
+		if(m_SoloCloudwatcher.isSqmAvailable()) {
+			std::stringstream().swap(ssTmp);
+			dTmp = m_SoloCloudwatcher.getSQM();
+			ssTmp << std::fixed << std::setprecision(2) << dTmp << " mpsas";
+			uiex->setText("SQM", ssTmp.str().c_str());
+		}
+		else {
+			uiex->setText("SQM", "N/A");
+
+		}
     }
 }
 
@@ -280,7 +307,10 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 {
     int nErr = SB_OK;
     int nTmp;
-    double dTmp;
+	double dTmp;
+	int dWindCond;
+	int nTempUnit;
+	double dSqm;
 
     if(!m_bLinked)
         return ERR_NOLINK;
@@ -288,37 +318,59 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     X2MutexLocker ml(GetMutex());
 
     nSecondsSinceGoodData = m_SoloCloudwatcher.getSecondOfGoodData();
-    dSkyTemp = m_SoloCloudwatcher.getSkyTemp();
-    dAmbTemp = m_SoloCloudwatcher.getAmbianTemp();
-    
-    dTmp = m_SoloCloudwatcher.getWindSpeed();
-    if(dTmp >-1)
-        dWind = dTmp;
+	dSkyTemp = m_SoloCloudwatcher.getSkyTemp();
+	dAmbTemp = m_SoloCloudwatcher.getAmbientTemp();
+	nTempUnit = m_SoloCloudwatcher.getTempUnit();
+	if(nTempUnit == FRH) {
+		// convert to C
+		dSkyTemp = (dSkyTemp-32) / 1.8;
+		dAmbTemp = (dAmbTemp-32) / 1.8;
+	}
+	else if(nTempUnit == KEL) {
+		dSkyTemp = dSkyTemp-273.15;
+		dAmbTemp = dAmbTemp-273.15;
+	}
 
-    nTmp = m_SoloCloudwatcher.getHumidity();
-    if(nTmp>-1)
-        nPercentHumdity = nTmp;
+	dSenT = m_SoloCloudwatcher.getSensorTemp();
+	dTmp = m_SoloCloudwatcher.getWindSpeed();
+	if(dTmp >-1)
+		dWind = dTmp;
 
-    dTmp = m_SoloCloudwatcher.getDewPointTemp();
-    if(dTmp<100)
-        dDewPointTemp = dTmp;
-    
-    dBarometricPressure = m_SoloCloudwatcher.getBarometricPressure();
 
-    // cloudCondition = (WeatherStationDataInterface::x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
-    // windCondition = (WeatherStationDataInterface::x2WindCond)m_SoloCloudwatcher.getWindCondition();
-    // rainCondition = (WeatherStationDataInterface::x2RainCond)m_SoloCloudwatcher.getRainCondition();
-    // daylightCondition = (WeatherStationDataInterface::x2DayCond)m_SoloCloudwatcher.getLightCondition();
+	nTmp = m_SoloCloudwatcher.getHumidity();
+	if(nTmp>-1)
+		nPercentHumdity = nTmp;
 
-	// solo cloudwatcher report 0 for unknow, 1 for safe, 2 for unsafe
+	dTmp = m_SoloCloudwatcher.getDewPointTemp();
+	if(dTmp<100)
+		dDewPointTemp = dTmp;
 
-	cloudCondition = (m_SoloCloudwatcher.getCloudCondition() == 1) ? WeatherStationDataInterface::x2CloudCond::cloudClear : WeatherStationDataInterface::x2CloudCond::cloudCloudy;
-	windCondition =  (m_SoloCloudwatcher.getWindCondition() == 1) ? WeatherStationDataInterface::x2WindCond::windCalm : WeatherStationDataInterface::x2WindCond::windWindy;
-	rainCondition = (m_SoloCloudwatcher.getRainCondition() == 1) ? WeatherStationDataInterface::x2RainCond::rainDry : WeatherStationDataInterface::x2RainCond::rainRain;
-	daylightCondition = (m_SoloCloudwatcher.getLightCondition() == 1) ? WeatherStationDataInterface::x2DayCond::dayDark : WeatherStationDataInterface::x2DayCond::dayVeryLight;
+	nRainHeaterPercentPower = m_SoloCloudwatcher.getHeaterPower();
+	nRainFlag = m_SoloCloudwatcher.getRainFlag();
+	nWetFlag = m_SoloCloudwatcher.getWetlag();
 
-	// solo cloudwatcher report 0 for unsafe, 1 for safe
-    nRoofCloseThisCycle = m_SoloCloudwatcher.getSafeCondition()==0?1:0;
+
+	dBarometricPressure = m_SoloCloudwatcher.getBarometricPressure();
+
+
+	dWindCond = m_SoloCloudwatcher.getWindCondition();
+
+	cloudCondition = (WeatherStationDataInterface::x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
+	windCondition = (WeatherStationDataInterface::x2WindCond)m_SoloCloudwatcher.getWindCondition();
+	rainCondition = (WeatherStationDataInterface::x2RainCond)m_SoloCloudwatcher.getRainCondition();
+	if(m_SoloCloudwatcher.isSqmAvailable()) {
+		dSqm = m_SoloCloudwatcher.getSQM();
+		if(dSqm >= m_dSqmThreshold) {
+			daylightCondition = WeatherStationDataInterface::x2DayCond::dayDark;
+		}
+		else {
+			daylightCondition = WeatherStationDataInterface::x2DayCond::dayLight;
+		}
+	}
+	else
+		daylightCondition = (WeatherStationDataInterface::x2DayCond)m_SoloCloudwatcher.getLightCondition();
+
+	nRoofCloseThisCycle = m_SoloCloudwatcher.getNeedClose();
 
 	return nErr;
 }

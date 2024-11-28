@@ -26,22 +26,6 @@ CSoloCloudwatcher::CSoloCloudwatcher()
     m_ThreadsAreRunning = false;
     m_sIpAddress.clear();
 
-    m_nCloudCondition = 0;
-    m_dSkyTemp = 0;
-    m_dTemp = 0;
-    m_dWindSpeed = 0;
-    m_nWindCondition = 0;
-    m_dWindGust = 0;
-    m_nRainCondition = 0;
-    m_nLightCondition = 0;
-    m_nPercentHumdity = 0;
-    m_nHumdityCondition = 0;
-    m_dDewPointTemp = 0;
-    m_dBarometricPressure = 0;
-    m_nBarometricPressureCondition = 0;
-    m_nOverallConditionSafe = 0;
-
-
 #ifdef PLUGIN_DEBUG
 #if defined(SB_WIN_BUILD)
     m_sLogfilePath = getenv("HOMEDRIVE");
@@ -253,60 +237,12 @@ size_t CSoloCloudwatcher::writeFunction(void* ptr, size_t size, size_t nmemb, vo
 
 #pragma mark - Getter / Setter
 
-int     CSoloCloudwatcher::getCloudCondition()
-{
-    return m_nCloudCondition;
-}
 
-double  CSoloCloudwatcher::getSkyTemp()
-{
-    return m_dSkyTemp;
-}
-
-double  CSoloCloudwatcher::getAmbianTemp()
-{
-    return m_dTemp;
-}
-
-double  CSoloCloudwatcher::getWindSpeed()
-{
-    return m_dWindSpeed;
-}
-
-int     CSoloCloudwatcher::getWindCondition()
-{
-    return m_nWindCondition;
-}
-
-double  CSoloCloudwatcher::getWindGust()
+double CSoloCloudwatcher::getWindGust()
 {
     return m_dWindGust;
 }
 
-int     CSoloCloudwatcher::getRainCondition()
-{
-    return m_nRainCondition;
-}
-
-int     CSoloCloudwatcher::getLightCondition()
-{
-    return m_nLightCondition;
-}
-
-int  CSoloCloudwatcher::getHumidity()
-{
-    return m_nPercentHumdity;
-}
-
-int     CSoloCloudwatcher::getHumdityCondition()
-{
-    return m_nHumdityCondition;
-}
-
-double  CSoloCloudwatcher::getDewPointTemp()
-{
-    return m_dDewPointTemp;
-}
 
 double  CSoloCloudwatcher::getBarometricPressure()
 {
@@ -318,15 +254,112 @@ int     CSoloCloudwatcher::getBarometricPressureCondition()
     return m_nBarometricPressureCondition;
 }
 
-int CSoloCloudwatcher::getSafeCondition()
-{
-    return m_nOverallConditionSafe;
-}
-
 double CSoloCloudwatcher::getSecondOfGoodData()
 {
     return m_goodDataTimer.GetElapsedSeconds();
 }
+
+int CSoloCloudwatcher::getTempUnit()
+{
+	return m_nTempUnit;
+}
+
+int CSoloCloudwatcher::getWindSpeedUnit()
+{
+	return m_nWinSpeedUnit;
+}
+
+
+double CSoloCloudwatcher::getSkyTemp()
+{
+	return m_dSkyTemp;
+}
+
+double CSoloCloudwatcher::getAmbientTemp()
+{
+	return m_dTemp;
+}
+
+double CSoloCloudwatcher::getSensorTemp()
+{
+	return m_dSensorTemp;
+}
+
+double CSoloCloudwatcher::getWindSpeed()
+{
+	return m_dWindSpeed;
+}
+
+double CSoloCloudwatcher::getHumidity()
+{
+	return m_dPercentHumdity;
+}
+
+double CSoloCloudwatcher::getDewPointTemp()
+{
+	return m_dDewPointTemp;
+}
+
+int CSoloCloudwatcher::getHeaterPower()
+{
+	return m_nheaterPower;
+}
+
+int CSoloCloudwatcher::getRainFlag()
+{
+	return m_nRainFlag;
+}
+
+int CSoloCloudwatcher::getWetlag()
+{
+	return m_nWetFlag;
+}
+
+int CSoloCloudwatcher::getTimeSinceGoodData()
+{
+	return m_nGoodDataSince;
+}
+
+bool CSoloCloudwatcher::getNeedClose()
+{
+	return m_bNeedClose;
+}
+
+int CSoloCloudwatcher::getCloudCondition()
+{
+	return m_nCloudCondition;
+}
+
+int CSoloCloudwatcher::getWindCondition()
+{
+	return m_nWindCondition;
+}
+
+int CSoloCloudwatcher::getRainCondition()
+{
+	return m_nRainCondition;
+}
+
+int CSoloCloudwatcher::getLightCondition()
+{
+	return m_nDaylightCondition;
+}
+
+bool CSoloCloudwatcher::getAlert()
+{
+	return m_bAlert;
+}
+
+double CSoloCloudwatcher::getSQM()
+{
+	return m_dSQM;
+}
+
+bool CSoloCloudwatcher::isSqmAvailable()
+{
+	return m_bHasSqm;
+}
+
 
 int CSoloCloudwatcher::getData()
 {
@@ -376,19 +409,11 @@ int CSoloCloudwatcher::getData()
 
             m_sFirmware = "Solo Cloudwatcher " + dictResp["cwinfo"];
             m_nCloudCondition = std::stoi(dictResp["cloudsSafe"]);
-            m_dSkyTemp = std::stod(dictResp["clouds"]);
-            m_dTemp = std::stod(dictResp["temp"]);
 
-            m_dWindSpeed = std::stod(dictResp["wind"]);
-            m_nWindCondition = std::stoi(dictResp["windSafe"]);
             m_dWindGust = std::stod(dictResp["gust"]);
-            m_nRainCondition = std::stoi(dictResp["rainSafe"]);
-            m_nLightCondition = std::stoi(dictResp["lightSafe"]);
             m_nOverallConditionSafe = std::stoi(dictResp["safe"]);
 
-            m_nPercentHumdity = std::stoi(dictResp["hum"]);
             m_nHumdityCondition = std::stoi(dictResp["humSafe"]);
-            m_dDewPointTemp = std::stod(dictResp["dewp"]);
 
             m_dBarometricPressure = std::stod(dictResp["relpress"]);
             m_nBarometricPressureCondition = std::stoi(dictResp["pressureSafe"]);
@@ -413,23 +438,84 @@ int CSoloCloudwatcher::getData()
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_sFirmware                    : " << m_sFirmware << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nCloudCondition              : " << m_nCloudCondition << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dSkyTemp                     : " << m_dSkyTemp << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dTemp                        : " << m_dTemp << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dWindSpeed                   : " << m_dWindSpeed << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nWindCondition               : " << m_nWindCondition << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dWindGust                    : " << m_dWindGust << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nRainCondition               : " << m_nRainCondition << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nLightCondition              : " << m_nLightCondition << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nOverallConditionSafe        : " << m_nOverallConditionSafe << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nPercentHumdity              : " << m_nPercentHumdity << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nHumdityCondition            : " << m_nHumdityCondition << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dDewPointTemp                : " << m_dDewPointTemp << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dBarometricPressure          : " << m_dBarometricPressure << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nBarometricPressureCondition : " << m_nBarometricPressureCondition << std::endl;
 
     m_sLogFile.flush();
 #endif
 
+	nErr = doGET("/cgi-bin/cgiGetDataFile?/home/aagsolo/aag_sld.dat", response_string);
+	if(nErr) {
+		m_goodDataTimer.Reset();
+		return ERR_CMDFAILED;
+	}
+
+	try {
+		// "New format" with SQM appended:
+		// Date       Time        T V   SkyT   AmbT   SenT   Wind Hum  DewPt Hea R W Since Now()Day's   c w r d C A   SQM
+		// 2005-06-03 02:07:23.34 C K  -28.5   18.7   22.5   45.3  75   10.3   3 0 0 00004 038506.08846 1 2 1 0 0 0 +21.88
+		// 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+		// 0         1         2         3         4         5         6         7         8         9        10        11
+		m_nTempUnit = response_string.at(23)=='C'?CEL:FRH;
+		m_nWinSpeedUnit = response_string.at(25)=='K'?KPH:MPH;
+		m_dSkyTemp = std::stod(response_string.substr(27,6));
+		m_dTemp = std::stod(response_string.substr(34,6));
+		m_dSensorTemp = std::stod(response_string.substr(41,6));
+		m_dWindSpeed = std::stod(response_string.substr(48,6));
+		m_dPercentHumdity = std::stod(response_string.substr(55,3));
+		m_dDewPointTemp = std::stod(response_string.substr(59,6));
+		m_nheaterPower = std::stoi(response_string.substr(66,3));
+		m_nRainFlag = int(response_string.at(70)) - 48; // 48->'0'
+		m_nWetFlag = int(response_string.at(72)) - 48;
+		m_nGoodDataSince = std::stoi(response_string.substr(74,5));
+		m_nCloudCondition = int(response_string.at(93)) - 48;
+		m_nWindCondition = int(response_string.at(95)) - 48;
+		m_nRainCondition = int(response_string.at(97)) - 48;
+		m_nDaylightCondition = int(response_string.at(99)) - 48;
+		m_bNeedClose = response_string.at(101)=='1'?true:false;
+		m_bAlert = response_string.at(103)=='1'?true:false;
+		if(response_string.size()>105) {
+			m_dSQM = std::stod(response_string.substr(105,6));
+			m_bHasSqm = true;
+		} else
+			m_bHasSqm = false;
+	}
+	catch (const std::exception& e) {
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+		m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] exception : " << e.what() << std::endl;
+		m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] exception response : " << response_string << std::endl;
+		m_sLogFile.flush();
+#endif
+		return ERR_CMDFAILED;
+	}
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nTempUnit            : " << m_nTempUnit << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nWinSpeedUnit        : " << m_nWinSpeedUnit << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dSkyTemp             : " << m_dSkyTemp << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dTemp                : " << m_dTemp << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dSensorTemp          : " << m_dSensorTemp << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dWindSpeed           : " << m_dWindSpeed << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dPercentHumdity      : " << m_dPercentHumdity << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dDewPointTemp        : " << m_dDewPointTemp << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nheaterPower         : " << m_nheaterPower << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nRainFlag            : " << m_nRainFlag << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nWetFlag             : " << m_nWetFlag << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nGoodDataSince       : " << m_nGoodDataSince << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nCloudCondition      : " << m_nCloudCondition << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nWindCondition       : " << m_nWindCondition << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nRainCondition       : " << m_nRainCondition << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nDaylightCondition   : " << m_nDaylightCondition << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_bNeedClose           : " << (m_bNeedClose?"Yes":"No") << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_bAlert               : " << (m_bAlert?"Yes":"No") << std::endl;
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_bHasSqm              : " << (m_bAlert?"Yes":"No") << std::endl;
+	if(m_bHasSqm)
+		m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dSQM                 : " << m_dSQM << std::endl;
+	m_sLogFile.flush();
+#endif
+	
     return nErr;
 }
 

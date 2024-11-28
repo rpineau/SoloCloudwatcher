@@ -46,14 +46,15 @@
 
 #include "StopWatch.h"
 
-#define PLUGIN_VERSION      1.15
+#define PLUGIN_VERSION      1.20
 
-// #define PLUGIN_DEBUG 3
+//#define PLUGIN_DEBUG 3
 
 // error codes
 enum SoloCloudwatcherErrors {PLUGIN_OK=0, NOT_CONNECTED, CANT_CONNECT, BAD_CMD_RESPONSE, COMMAND_FAILED, COMMAND_TIMEOUT, PARSE_FAILED};
 
 enum SoloCloudwatcherWindUnits {KPH=0, MPS, MPH};
+enum SoloCloudwatcherTempUnits {CEL=0, FRH, KEL};
 
 class CSoloCloudwatcher
 {
@@ -76,26 +77,43 @@ public:
     void getIpAddress(std::string &IpAddress);
     void setIpAddress(std::string IpAddress);
 
-    int     getCloudCondition();
-    double  getSkyTemp();
-    double  getAmbianTemp();
-
-    double  getWindSpeed();
-    int     getWindCondition();
     double  getWindGust();
 
-    int     getRainCondition();
-    int     getLightCondition();
-
-    int     getHumidity();
     int     getHumdityCondition();
-    double  getDewPointTemp();
 
     double  getBarometricPressure();
     int     getBarometricPressureCondition();
 
     int     getSafeCondition();
     double  getSecondOfGoodData();
+
+
+
+	int     getTempUnit();
+	int     getWindSpeedUnit();
+	double  getSkyTemp();
+	double  getAmbientTemp();
+	double  getSensorTemp();
+	double  getWindSpeed();
+	double  getHumidity();
+	double  getDewPointTemp();
+	int     getHeaterPower();
+	int     getRainFlag();
+	int     getWetlag();
+	int     getTimeSinceGoodData();
+
+	int     getCloudCondition();
+	int     getWindCondition();
+	int     getRainCondition();
+	int     getLightCondition();
+	bool    getNeedClose();
+	bool    getAlert();
+
+	double  getSQM();
+
+	bool    isSqmAvailable();
+
+
 
 #ifdef PLUGIN_DEBUG
     void  log(const std::string sLogLine);
@@ -119,31 +137,48 @@ protected:
     std::thread         m_th;
 
     // SoloCloudwatcher variables
-    std::atomic<int>    m_nCloudCondition;
-    std::atomic<double> m_dSkyTemp;
-    std::atomic<double> m_dTemp;
 
-    std::atomic<double> m_dWindSpeed;
-    std::atomic<int>    m_nWindCondition;
     std::atomic<double> m_dWindGust;
 
-    std::atomic<int>    m_nRainCondition;
-    std::atomic<int>    m_nLightCondition;
-
-    std::atomic<int>    m_nPercentHumdity;
     std::atomic<int>    m_nHumdityCondition;
-    std::atomic<double> m_dDewPointTemp;
-
 
     std::atomic<double> m_dBarometricPressure; // relpress
     std::atomic<int>    m_nBarometricPressureCondition;
 
     std::atomic<int>    m_nOverallConditionSafe;
 
+
+	int                 m_nTempUnit = CEL;
+	int                 m_nWinSpeedUnit = KPH;
+	std::atomic<double> m_dSkyTemp = -999;
+	std::atomic<double> m_dTemp = -999;
+	std::atomic<double> m_dSensorTemp = -999;
+	std::atomic<double> m_dWindSpeed = 0;
+	std::atomic<double> m_dPercentHumdity = 0;
+	std::atomic<double> m_dDewPointTemp = 0;
+	std::atomic<int>    m_nheaterPower = 0;
+
+	std::atomic<int>    m_nRainFlag = 0;
+	std::atomic<int>    m_nWetFlag = 0;
+	std::atomic<int>    m_nGoodDataSince = 0;
+
+	// std::atomic<double> m_dBarometricPressure;
+	std::atomic<int>    m_nCloudCondition = 0;
+	std::atomic<int>    m_nWindCondition = 0;
+	std::atomic<int>    m_nRainCondition = 0;
+	std::atomic<int>    m_nDaylightCondition = 0;
+	std::atomic<bool>   m_bNeedClose = false;
+	std::atomic<bool>   m_bAlert = false;
+	std::atomic<double> m_dSQM = 0;
+
+	std::atomic<bool>   m_bSafe = false;
+	std::atomic<bool>   m_bHasSqm = false;
+
+
     CStopWatch      m_goodDataTimer;
 
-    bool            m_bSafe;
-    int             doGET(std::string sCmd, std::string &sResp);
+
+	int             doGET(std::string sCmd, std::string &sResp);
     int             getModelName();
     int             getFirmwareVersion();
     
