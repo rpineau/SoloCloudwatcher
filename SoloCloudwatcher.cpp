@@ -376,7 +376,7 @@ int CSoloCloudwatcher::getData()
     m_sLogFile.flush();
 #endif
 
-    // do http GET request to PLC got get current Az or Ticks .. TBD
+    // do http GET
     nErr = doGET("/cgi-bin/cgiLastData", response_string);
     if(nErr) {
         m_goodDataTimer.Reset();
@@ -408,7 +408,6 @@ int CSoloCloudwatcher::getData()
 #endif
 
             m_sFirmware = "Solo Cloudwatcher " + dictResp["cwinfo"];
-            m_nCloudCondition = std::stoi(dictResp["cloudsSafe"]);
 
             m_dWindGust = std::stod(dictResp["gust"]);
             m_nOverallConditionSafe = std::stoi(dictResp["safe"]);
@@ -437,7 +436,6 @@ int CSoloCloudwatcher::getData()
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_sFirmware                    : " << m_sFirmware << std::endl;
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nCloudCondition              : " << m_nCloudCondition << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dWindGust                    : " << m_dWindGust << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_nOverallConditionSafe        : " << m_nOverallConditionSafe << std::endl;
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getData] m_dBarometricPressure          : " << m_dBarometricPressure << std::endl;
