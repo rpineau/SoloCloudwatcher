@@ -355,9 +355,9 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 
 	dWindCond = m_SoloCloudwatcher.getWindCondition();
 
-	cloudCondition = (WeatherStationDataInterface::x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
-	windCondition = (WeatherStationDataInterface::x2WindCond)m_SoloCloudwatcher.getWindCondition();
-	rainCondition = (WeatherStationDataInterface::x2RainCond)m_SoloCloudwatcher.getRainCondition();
+	cloudCondition = (x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
+	windCondition = (x2WindCond)m_SoloCloudwatcher.getWindCondition();
+	rainCondition = (x2RainCond)m_SoloCloudwatcher.getRainCondition();
 	if(m_SoloCloudwatcher.isSqmAvailable()) {
 		dSqm = m_SoloCloudwatcher.getSQM();
 		if(dSqm >= m_dSqmThreshold) {
@@ -371,10 +371,10 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 		daylightCondition = (WeatherStationDataInterface::x2DayCond)m_SoloCloudwatcher.getLightCondition();
 
 
-	if ( cloudCondition >= WeatherStationDataInterface::x2CloudCond::cloudCloudy ||
-			rainCondition >= WeatherStationDataInterface::x2RainCond::rainWet ||
-			windCondition >= WeatherStationDataInterface::x2WindCond::windWindy ||
-			daylightCondition >= WeatherStationDataInterface::x2DayCond::dayLight
+	if ( cloudCondition >= x2CloudCond::cloudCloudy ||
+			rainCondition >= x2RainCond::rainWet ||
+			windCondition >= x2WindCond::windWindy ||
+			daylightCondition >= x2DayCond::dayLight
 		) {
 		nRoofCloseThisCycle = 1;
 	}
