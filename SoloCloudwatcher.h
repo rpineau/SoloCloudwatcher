@@ -46,7 +46,7 @@
 
 #include "StopWatch.h"
 
-#define PLUGIN_VERSION      1.20
+#define PLUGIN_VERSION      1.22
 
 //#define PLUGIN_DEBUG 3
 
