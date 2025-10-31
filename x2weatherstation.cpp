@@ -308,7 +308,6 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     int nErr = SB_OK;
     int nTmp;
 	double dTmp;
-	int dWindCond;
 	int nTempUnit;
 	double dSqm;
 
@@ -351,9 +350,6 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 
 
 	dBarometricPressure = m_SoloCloudwatcher.getBarometricPressure();
-
-
-	dWindCond = m_SoloCloudwatcher.getWindCondition();
 
 	cloudCondition = (x2CloudCond)m_SoloCloudwatcher.getCloudCondition();
 	windCondition = (x2WindCond)m_SoloCloudwatcher.getWindCondition();
